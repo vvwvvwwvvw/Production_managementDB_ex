@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 namespace InventoryDB_ex
 {
     public partial class Form1 : Form
@@ -128,9 +129,9 @@ namespace InventoryDB_ex
                 cmd.Parameters.AddWithValue("@enddate", date);
                 cmd.Parameters.AddWithValue("@procode", code);
                 cmd.ExecuteNonQuery();
-                conn.Close();
-                LoadPlan();
             }
+            conn.Close();
+            LoadPlan();
         }
         private void btSummary_Click(object sender, EventArgs e)
         {
@@ -170,39 +171,54 @@ namespace InventoryDB_ex
 
         public int QueryPlanQty(string item, string planYear, string planMonth)
         {
-            conn.Open();
-            string query = "select sum(qty) from production where YEAR(startdate) = @year and MONTH(startdate) = @month and item = @item";
-            SqlCommand cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@year", planYear);
-            cmd.Parameters.AddWithValue("@month", planMonth);
-            cmd.Parameters.AddWithValue("@item", item);
-            SqlDataReader r = cmd.ExecuteReader();
-
             int qty = 0;
-            if (r.Read() && r[0] != DBNull.Value)
+
+            // using 문으로 SqlConnection과 SqlDataReader를 자동으로 관리
+            using (SqlConnection conn = new SqlConnection("Data Source = .; Initial Catalog = production; Integrated Security = True"))
             {
-                qty = int.Parse(r[0].ToString());
-            }
-            conn.Close();
+                conn.Open();
+                string query = "select sum(qty) from production where YEAR(startdate) = @year and MONTH(startdate) = @month and item = @item";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@year", planYear);
+                cmd.Parameters.AddWithValue("@month", planMonth);
+                cmd.Parameters.AddWithValue("@item", item);
+
+                using (SqlDataReader r = cmd.ExecuteReader())
+                {
+                    if (r.Read() && r[0] != DBNull.Value)
+                    {
+                        qty = Convert.ToInt32(r[0]);
+                    }
+                } // SqlDataReader가 자동으로 닫힘
+            } // SqlConnection이 자동으로 닫힘
+
             return qty;
         }
 
+
         public int QueryCompleteQty(string item, string planYear, string planMonth)
         {
-            conn.Open();
-            string query = "select sum(qty) from production where YEAR(startdate) = @year and MONTH(startdate) = @month and item = @item and enddate is not null";
-            SqlCommand cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@year", planYear);
-            cmd.Parameters.AddWithValue("@month", planMonth);
-            cmd.Parameters.AddWithValue("@item", item);
-            SqlDataReader r = cmd.ExecuteReader();
-
             int qty = 0;
-            if (r.Read() && r[0] != DBNull.Value)
+
+            // using 문으로 SqlConnection과 SqlDataReader를 자동으로 관리
+            using (SqlConnection conn = new SqlConnection("Data Source = .; Initial Catalog = production; Integrated Security = True"))
             {
-                qty = int.Parse(r[0].ToString());
-            }
-            conn.Close();
+                conn.Open();
+                string query = "select sum(qty) from production where YEAR(startdate) = @year and MONTH(startdate) = @month and item = @item and enddate is not null";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@year", planYear);
+                cmd.Parameters.AddWithValue("@month", planMonth);
+                cmd.Parameters.AddWithValue("@item", item);
+
+                using (SqlDataReader r = cmd.ExecuteReader())
+                {
+                    if (r.Read() && r[0] != DBNull.Value)
+                    {
+                        qty = Convert.ToInt32(r[0]);
+                    }
+                } // SqlDataReader가 자동으로 닫힘
+            } // SqlConnection이 자동으로 닫힘
+
             return qty;
         }
     }
