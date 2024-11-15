@@ -132,6 +132,78 @@ namespace InventoryDB_ex
                 LoadPlan();
             }
         }
+        private void btSummary_Click(object sender, EventArgs e)
+        {
+            if (cbYear.SelectedItem == null || cbMonth.SelectedItem == null)
+            {
+                MessageBox.Show("년도와 월을 선택하세요");
+                return;
+            }
+            string planYear = cbYear.SelectedItem.ToString();
+            string planMonth = cbMonth.SelectedItem.ToString();
+            txtSummary.Text = "";
+
+            conn.Open();
+            string query = "select distinct(item) from production where YEAR(startdate) = @year and MONTH(startdate) = @month";
+            SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@year", planYear);
+            cmd.Parameters.AddWithValue("@month", planMonth);
+            SqlDataReader r = cmd.ExecuteReader();
+
+            while (r.Read())
+            {
+                string item = r[0]?.ToString() ?? "";
+                if (!string.IsNullOrEmpty(item))
+                {
+                    int planQty = QueryPlanQty(item, planYear, planMonth);
+                    int completeQty = QueryCompleteQty(item, planYear, planMonth);
+                    double progress = 0.0;
+                    if (planQty > 0)
+                    {
+                        progress = 100.0 * ((double)completeQty / planQty);
+                        txtSummary.Text += $"{item} 계획량 = {planQty}, 완료량 = {completeQty}, 진척률 = {progress:F2}%\r\n";
+                    }
+                }
+            }
+            conn.Close();
+        }
+
+        public int QueryPlanQty(string item, string planYear, string planMonth)
+        {
+            conn.Open();
+            string query = "select sum(qty) from production where YEAR(startdate) = @year and MONTH(startdate) = @month and item = @item";
+            SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@year", planYear);
+            cmd.Parameters.AddWithValue("@month", planMonth);
+            cmd.Parameters.AddWithValue("@item", item);
+            SqlDataReader r = cmd.ExecuteReader();
+
+            int qty = 0;
+            if (r.Read() && r[0] != DBNull.Value)
+            {
+                qty = int.Parse(r[0].ToString());
+            }
+            conn.Close();
+            return qty;
+        }
+
+        public int QueryCompleteQty(string item, string planYear, string planMonth)
+        {
+            conn.Open();
+            string query = "select sum(qty) from production where YEAR(startdate) = @year and MONTH(startdate) = @month and item = @item and enddate is not null";
+            SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@year", planYear);
+            cmd.Parameters.AddWithValue("@month", planMonth);
+            cmd.Parameters.AddWithValue("@item", item);
+            SqlDataReader r = cmd.ExecuteReader();
+
+            int qty = 0;
+            if (r.Read() && r[0] != DBNull.Value)
+            {
+                qty = int.Parse(r[0].ToString());
+            }
+            conn.Close();
+            return qty;
+        }
     }
 }
-

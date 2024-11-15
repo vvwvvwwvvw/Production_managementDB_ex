@@ -146,6 +146,7 @@
             this.btSummary.TabIndex = 7;
             this.btSummary.Text = "생산 실적 조회";
             this.btSummary.UseVisualStyleBackColor = true;
+            this.btSummary.Click += new System.EventHandler(this.btSummary_Click);
             // 
             // txtSummary
             // 
