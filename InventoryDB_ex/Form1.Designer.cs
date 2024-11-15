@@ -64,6 +64,8 @@
             // cbYear
             // 
             this.cbYear.FormattingEnabled = true;
+            this.cbYear.Items.AddRange(new object[] {
+            "2024"});
             this.cbYear.Location = new System.Drawing.Point(137, 15);
             this.cbYear.Name = "cbYear";
             this.cbYear.Size = new System.Drawing.Size(121, 23);
@@ -90,6 +92,8 @@
             // cbMonth
             // 
             this.cbMonth.FormattingEnabled = true;
+            this.cbMonth.Items.AddRange(new object[] {
+            "11"});
             this.cbMonth.Location = new System.Drawing.Point(438, 16);
             this.cbMonth.Name = "cbMonth";
             this.cbMonth.Size = new System.Drawing.Size(121, 23);
@@ -103,6 +107,7 @@
             this.btPlanQuery.TabIndex = 4;
             this.btPlanQuery.Text = "생산 계획 조회";
             this.btPlanQuery.UseVisualStyleBackColor = true;
+            this.btPlanQuery.Click += new System.EventHandler(this.btPlanQuery_Click);
             // 
             // btDelete
             // 
@@ -112,6 +117,7 @@
             this.btDelete.TabIndex = 5;
             this.btDelete.Text = "생산 계획 삭제";
             this.btDelete.UseVisualStyleBackColor = true;
+            this.btDelete.Click += new System.EventHandler(this.btDelete_Click);
             // 
             // proList
             // 
@@ -251,6 +257,10 @@
             // cbItem
             // 
             this.cbItem.FormattingEnabled = true;
+            this.cbItem.Items.AddRange(new object[] {
+            "모니터",
+            "키보드",
+            "마우스"});
             this.cbItem.Location = new System.Drawing.Point(59, 27);
             this.cbItem.Name = "cbItem";
             this.cbItem.Size = new System.Drawing.Size(121, 23);
@@ -268,6 +278,9 @@
             // cbWorkcenter
             // 
             this.cbWorkcenter.FormattingEnabled = true;
+            this.cbWorkcenter.Items.AddRange(new object[] {
+            "wc01",
+            "wc02"});
             this.cbWorkcenter.Location = new System.Drawing.Point(74, 76);
             this.cbWorkcenter.Name = "cbWorkcenter";
             this.cbWorkcenter.Size = new System.Drawing.Size(121, 23);

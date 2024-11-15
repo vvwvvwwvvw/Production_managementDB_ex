@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -38,13 +39,22 @@ namespace InventoryDB_ex
             while (r.Read())
             {
                 for (int i = 0; i < 6; i++)
-                    fields[i] = r.ToString();
-                fields[4] = fields[4].Substring(0, 10); // 뒤에 시간정보 제거
+                {
+                    // 각 열의 값을 읽어와서 배열에 저장
+                    fields[i] = r[i].ToString();
+                }
+                // 날짜 정보에서 시간 제거
+                if (fields[4].Length > 10)
+                    fields[4] = fields[4].Substring(0, 10);
+
                 if (fields[5].Length > 10)
-                    fields[5] = fields[5].Substring(0, 10); // 뒤에 시간정보 제거
+                    fields[5] = fields[5].Substring(0, 10);
+
+                // ListView에 행 추가
                 ListViewItem row = new ListViewItem(fields);
                 proList.Items.Add(row);
             }
+
             conn.Close();
         }
         public int NewProCode()
@@ -57,6 +67,7 @@ namespace InventoryDB_ex
             int proCode = 1;
             if (r[0].ToString().Length > 0) proCode = int.Parse(r[0].ToString());
             r.Close();
+            conn.Close();
             return proCode;
         }
 
@@ -70,15 +81,29 @@ namespace InventoryDB_ex
             int procode =  NewProCode();
             string item = cbItem.SelectedItem.ToString();
             string wc = cbWorkcenter.SelectedItem.ToString();
-            string date = dtStart.Value.Date.ToString("yyyy-MM-dd");
+            DateTime date = dtStart.Value;
             int qty = int.Parse(txtQty.Text);
 
             conn.Open();
-            string query = String.Format("insert into prodution (procode,item, wc, date, qty) values (@procode,@item,@workcenter,@startdate,@qty)");
+            string query = "insert into production (procode, item, workcenter, startdate, qty) values (@procode, @item, @workcenter, @startdate, @qty)";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@procode",procode);
+            cmd.Parameters.AddWithValue("@item",item);
+            cmd.Parameters.AddWithValue("@workcenter",wc);
+            cmd.Parameters.AddWithValue("@startdate", date);
+            cmd.Parameters.AddWithValue("@qty",qty);
             cmd.ExecuteNonQuery();
             conn.Close();
             LoadPlan();
+        }
+
+        private void btPlanQuery_Click(object sender, EventArgs e)
+        {
+            LoadPlan();
+        }
+
+        private void btDelete_Click(object sender, EventArgs e)
+        {
 
         }
     }
