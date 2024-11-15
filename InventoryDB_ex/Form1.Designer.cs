@@ -237,6 +237,7 @@
             this.btComplete.TabIndex = 13;
             this.btComplete.Text = "생산 완료등록";
             this.btComplete.UseVisualStyleBackColor = true;
+            this.btComplete.Click += new System.EventHandler(this.btComplete_Click);
             // 
             // dtEnd
             // 

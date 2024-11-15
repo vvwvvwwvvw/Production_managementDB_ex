@@ -73,12 +73,12 @@ namespace InventoryDB_ex
 
         private void btAdd_Click(object sender, EventArgs e)
         {
-            if(cbItem.SelectedItem == null || cbWorkcenter.SelectedItem == null || txtQty.TextLength == 0)
+            if (cbItem.SelectedItem == null || cbWorkcenter.SelectedItem == null || txtQty.TextLength == 0)
             {
                 MessageBox.Show("품목과 작업장 및 수량을 체크하세요");
                 return;
             }
-            int procode =  NewProCode();
+            int procode = NewProCode();
             string item = cbItem.SelectedItem.ToString();
             string wc = cbWorkcenter.SelectedItem.ToString();
             DateTime date = dtStart.Value;
@@ -87,11 +87,11 @@ namespace InventoryDB_ex
             conn.Open();
             string query = "insert into production (procode, item, workcenter, startdate, qty) values (@procode, @item, @workcenter, @startdate, @qty)";
             SqlCommand cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@procode",procode);
-            cmd.Parameters.AddWithValue("@item",item);
-            cmd.Parameters.AddWithValue("@workcenter",wc);
+            cmd.Parameters.AddWithValue("@procode", procode);
+            cmd.Parameters.AddWithValue("@item", item);
+            cmd.Parameters.AddWithValue("@workcenter", wc);
             cmd.Parameters.AddWithValue("@startdate", date);
-            cmd.Parameters.AddWithValue("@qty",qty);
+            cmd.Parameters.AddWithValue("@qty", qty);
             cmd.ExecuteNonQuery();
             conn.Close();
             LoadPlan();
@@ -104,7 +104,33 @@ namespace InventoryDB_ex
 
         private void btDelete_Click(object sender, EventArgs e)
         {
-
+            if (proList.SelectedItems.Count > 0)
+            {
+                string code = proList.SelectedItems[0].SubItems[0].Text;
+                conn.Open();
+                string query = "delete from production where procode = @procode";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@procode", code);
+                cmd.ExecuteNonQuery();
+                conn.Close();
+                LoadPlan();
+            }
+        }
+        private void btComplete_Click(object sender, EventArgs e)
+        {
+            if (proList.SelectedItems.Count > 0)
+            {
+                string code = proList.SelectedItems[0].SubItems[0].Text;
+                string date = dtEnd.Value.Date.ToString("yyyy-MM-dd");
+                conn.Open();
+                string query = "update production set enddate = @enddate where procode = @procode";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@enddate", date);
+                cmd.Parameters.AddWithValue("@procode", code);
+                cmd.ExecuteNonQuery();
+                conn.Close();
+                LoadPlan();
+            }
         }
     }
 }
